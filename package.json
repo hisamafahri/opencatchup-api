@@ -1,0 +1,18 @@
+{
+  "name": "opencatchup-api",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "bootstrap": " npx prisma@latest generate",
+    "migrate:dev": "npx prisma@latest migrate dev",
+    "migrate:prod": "npx prisma@latest migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "better-auth": "^1.2.9",
+    "hono": "^4.7.11"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prisma": "^6.9.0"
+  }
+}
