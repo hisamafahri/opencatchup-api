@@ -8,7 +8,7 @@ app.use(
   "*",
   cors({
     origin: Bun.env.CORS_ORIGIN.split(",") || [],
-    allowHeaders: ["Content-Type", "Authorization"],
+    allowHeaders: ["Content-Type", "Authorization", "x-captcha-response"],
     allowMethods: ["POST", "GET", "OPTIONS"],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,

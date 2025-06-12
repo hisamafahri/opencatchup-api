@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { captcha } from "better-auth/plugins";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import db from "./db";
 
@@ -29,4 +30,10 @@ export const auth = betterAuth({
       requireSelectAccount: true,
     },
   },
+  plugins: [
+    captcha({
+      provider: "cloudflare-turnstile",
+      secretKey: env.TURNSTILE_SECRET_KEY,
+    }),
+  ],
 });
