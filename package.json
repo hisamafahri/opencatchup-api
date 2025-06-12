@@ -9,7 +9,8 @@
   "dependencies": {
     "@prisma/client": "^6.9.0",
     "better-auth": "^1.2.9",
-    "hono": "^4.7.11"
+    "hono": "^4.7.11",
+    "resend": "^4.5.2"
   },
   "devDependencies": {
     "@types/bun": "latest",

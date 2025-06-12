@@ -16,6 +16,8 @@ declare global {
       MICROSOFT_OAUTH_CLIENT_ID: string;
       MICROSOFT_OAUTH_CLIENT_SECRET: string;
 
+      RESEND_API_KEY: string;
+
       CORS_ORIGIN: string;
       FRONTEND_URL: string;
     }

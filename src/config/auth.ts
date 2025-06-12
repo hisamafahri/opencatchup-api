@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { captcha } from "better-auth/plugins";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { sendEmail } from "./email";
 import db from "./db";
 
 const env = typeof Bun !== "undefined" ? Bun.env : process.env;
@@ -11,7 +12,19 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   trustedOrigins: env.CORS_ORIGIN.split(",") || [],
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: false,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Verify your email address",
+        text: `Click the link to verify your email: ${url}`,
+      });
+    },
+  },
   emailAndPassword: {
+    requireEmailVerification: true,
     enabled: true,
   },
   socialProviders: {
