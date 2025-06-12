@@ -19,6 +19,12 @@ app.use(
 app.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
 app.get("/ping", (c) => c.text("pong"));
 app.get("/", (c) => c.redirect(Bun.env.FRONTEND_URL, 302));
+app.get("/reset-password", (c) =>
+  c.redirect(
+    Bun.env.FRONTEND_URL + "/reset-password" + `?token=${c.req.query("token")}`,
+    302,
+  ),
+);
 app.options("*", (c) => c.body(null, 204));
 
 export default {
