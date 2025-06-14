@@ -1,8 +1,9 @@
 import { betterAuth } from "better-auth";
-import { captcha } from "better-auth/plugins";
+import { captcha, username } from "better-auth/plugins";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { sendEmail } from "./email";
 import db from "./db";
+import { normalizeEmail } from "../lib/utils/string";
 
 const env = typeof Bun !== "undefined" ? Bun.env : process.env;
 
@@ -11,6 +12,29 @@ export const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user, ctx) => {
+          const url = new URL(ctx?.request?.url || "http://localhost");
+          let prefix = "other_";
+
+          if (url.pathname === "/auth/callback/google") {
+            prefix = "google_";
+          } else if (url.pathname === "/auth/callback/microsoft") {
+            prefix = "microsoft_";
+          }
+
+          const username =
+            // @ts-expect-error
+            user?.username ||
+            normalizeEmail(user.email, prefix) ||
+            crypto.randomUUID();
+          return { data: { ...user, username, displayUsername: username } };
+        },
+      },
+    },
+  },
   trustedOrigins: env.CORS_ORIGIN.split(",") || [],
   emailVerification: {
     sendOnSignUp: true,
@@ -51,6 +75,18 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    username({
+      minUsernameLength: 4,
+      maxUsernameLength: 1024,
+      usernameValidator: async (username) => {
+        // TODO: reserved username
+        if (username === "admin") {
+          return false;
+        }
+
+        return true;
+      },
+    }),
     captcha({
       provider: "cloudflare-turnstile",
       secretKey: env.TURNSTILE_SECRET_KEY,
