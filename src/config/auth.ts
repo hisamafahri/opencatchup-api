@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
-import { captcha, username } from "better-auth/plugins";
+import { APIError } from "better-auth/api";
+import { captcha, createAuthMiddleware, username } from "better-auth/plugins";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { sendEmail } from "./email";
 import db from "./db";
@@ -12,6 +13,21 @@ export const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.context.returned instanceof APIError) {
+        throw new APIError(ctx.context.returned.status, {
+          success: false,
+          data: ctx.context.returned.body,
+        });
+      } else {
+        return ctx.json({
+          success: true,
+          data: ctx.context.returned,
+        });
+      }
+    }),
+  },
   databaseHooks: {
     user: {
       create: {
